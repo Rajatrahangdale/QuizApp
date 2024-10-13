@@ -1,6 +1,9 @@
 import { useState } from "react";
 
-const App = () => {
+export default function App() {
+  // Define a state variable here to track question status
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
   const questions = [
     {
       questionText: "What is the capital of France?",
@@ -39,109 +42,67 @@ const App = () => {
       ],
     },
   ];
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState();
-  const [selectedAnswer, setSelectedAnswer] = useState([]);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [score, setScore] = useState(0);
-  const [isFinish, setFinish] = useState(false);
 
-  const handleNextQuestion = () => {
-    setSelectedAnswerIndex(null);
-    if (currentQuestionIndex === questions.length - 1) {
-      return setFinish(true);
+  function handleAnswerClick(correct) {
+    // Check if correct answer is pressed. (See the hint on the left)
+    if (correct) {
+      setScore((prev) => prev + 1);
+    }
+    if (currentIndex === questions.length - 1) {
+      // quiz over
+      setQuizFinished(true);
     } else {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-      setSelectedAnswer(() => {
-        return questions.map(({ questionText, answerOptions }) => {
-          return {
-            questionText,
-            answerOptions: answerOptions.find(({ isCorrect }) => isCorrect),
-          };
-        });
-      });
+      setCurrentIndex((value) => value + 1);
     }
-  };
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex === 0) {
-      return;
-    }
-    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
-  };
+  }
+
+  const [quizFinished, setQuizFinished] = useState(false);
+
+  // Create a state variable here [score, setScore]
 
   return (
-    <>
-      {isFinish ? (
-        <div className="container">
-          <h1>Game Over!</h1>
-          <p>
-            Your final score is {score} out of {questions.length}.
-          </p>
-          <button
-            className="btn"
-            onClick={() => {
-              setFinish(false);
-              console.log(selectedAnswer);
-              setCurrentQuestionIndex(0);
-            }}
-          >
-            Restart
-          </button>
-        </div>
-      ) : (
-        <div className="container">
-          <h1 className="headline-1">Quize App</h1>
-          <div className="box">
-            <div className="que">
-              <h3 className="">
-                <span>{currentQuestionIndex + 1}. &nbsp; </span>
-                {questions[currentQuestionIndex].questionText}
-              </h3>
-              {questions[currentQuestionIndex].answerOptions.map(
-                ({ answerText }, index) => {
-                  return (
-                    <p
-                      onClick={() => {
-                        setSelectedAnswerIndex(index);
-                      }}
-                      key={index}
-                      style={{
-                        backgroundColor:
-                          selectedAnswerIndex === index && "green",
-                      }}
-                    >
-                      {answerText}
-                    </p>
-                  );
-                }
-              )}
-            </div>
-            <div className="footer">
-              <button
-                disabled={currentQuestionIndex === 0}
-                onClick={handlePreviousQuestion}
-                className="btn prev"
-              >
-                Prev
-              </button>
-              <button
-                onClick={handleNextQuestion}
-                className="btn next"
-                style={{
-                  backgroundColor:
-                    currentQuestionIndex === questions.length - 1 && "green",
-                }}
-              >
-                {currentQuestionIndex === questions.length - 1
-                  ? "Finish"
-                  : "Next"}
-              </button>
-            </div>
+    <div className="app">
+      {quizFinished ? (
+        /* Change this hardcoded 1 to state variable score else */
+        <div className="score-section">
+          You scored {score} out of {questions.length}
+          <div className="">
+            <button
+              onClick={() => {
+                setCurrentIndex(0);
+                setScore(0);
+                setQuizFinished(false);
+              }}
+            >
+              Restart
+            </button>
           </div>
         </div>
+      ) : (
+        <>
+          <div className="question-section">
+            <div className="question-count">
+              <span>Question {currentIndex + 1}</span>/{questions.length}
+            </div>
+            <div className="question-text">
+              {questions[currentIndex].questionText}
+            </div>
+          </div>
+          <div className="answer-section">
+            {questions[currentIndex].answerOptions.map((answer) => {
+              // Add onClick listener to this button
+              return (
+                <button
+                  onClick={() => handleAnswerClick(answer.isCorrect)}
+                  key={answer.answerText}
+                >
+                  {answer.answerText}
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
-    </>
+    </div>
   );
-};
-
-export default App;
+}
