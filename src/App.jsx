@@ -55,14 +55,14 @@ export default function App() {
     } else {
       setCurrentIndex((value) => value + 1);
     }
-    setSelectedAnswer(null); 
+    setSelectedAnswer(null);
     setSelectedAnswerIndex(null);
   }
 
   return (
     <div className="app">
       {quizFinished ? (
-        <div className="score-section">
+        <div className="">
           You scored {score} out of {questions.length}
           <div>
             <button
@@ -106,7 +106,7 @@ export default function App() {
               </div>
             ))}
             <button
-              onClick={()=>handleAnswerClick(selectedAnswer)}
+              onClick={() => handleAnswerClick(selectedAnswer)}
               disabled={selectedAnswer === null}
             >
               Next
